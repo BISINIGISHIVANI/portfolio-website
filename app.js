@@ -531,7 +531,7 @@ function initializeViewToggles() {
 
 function initializeContactForm() {
   if (!contactForm) return;
-  emailjs.init('uwMzMd72bjqBXUOXO'); // Your User ID
+ 
   contactForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -574,13 +574,14 @@ function initializeContactForm() {
     
     // Simulate form submission with proper promise resolution
     try {
-      const resp = await fetch('/.netlify/functions/send-email', {
+      const resp = await fetch('/api/send-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
 
       if (!resp.ok) throw new Error(await resp.text());
+  
       // Show success message
       if (formStatus) {
         formStatus.className = 'form-status success';
