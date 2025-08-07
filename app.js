@@ -162,6 +162,7 @@ function initializeTheme() {
 }
 
 function toggleTheme() {
+  console.log('Theme toggle clicked'); // Debug log
   const currentTheme = document.body.getAttribute('data-color-scheme') || 'dark';
   const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
   
@@ -527,13 +528,10 @@ function initializeViewToggles() {
 }
 
 // Contact Form - Fixed
-require('dotenv').config();
-// api/send-email.js
 
-const emailjs = require('emailjs-com');
 function initializeContactForm() {
   if (!contactForm) return;
-  emailjs.init(process.env.EMAILJS_PUBLIC_KEY);
+  emailjs.init('UwMzMd72bjqBXUOXO');
 
   contactForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -577,24 +575,19 @@ function initializeContactForm() {
     
     // Simulate form submission with proper promise resolution
     try {
-      // const resp = await fetch('https://api.emailjs.com/api/v1.0/email/send-form', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(data)
-      // });
-
-      // if (!resp.ok) throw new Error(await resp.text());
+     
   
-  await emailjs.send(
-        process.env.EMAILJS_SERVICE_ID,
-        process.env.EMAILJS_TEMPLATE_ADMIN,
-       contactForm
+      await emailjs.sendForm(
+        'service_hqlzwfo',         // ← Your Service ID
+        'template_cpejvrk',     // ← Admin notification template ID
+        contactForm
       );
-      await emailjs.send(
-        process.env.EMAILJS_SERVICE_ID,
-        process.env.EMAILJS_TEMPLATE_USER,
-        {name:contactForm.name.value, email:contactForm.email.value, subject:contactForm.subject.value, message:contactForm.message.value}
-      );
+      await emailjs.sendForm( 
+        'service_hqlzwfo',         // ← Your Service ID
+        'template_0orfrol',      // ← User notification template ID
+        contactForm
+      )
+
       // Show success message
       if (formStatus) {
         formStatus.className = 'form-status success';
