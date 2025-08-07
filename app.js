@@ -528,7 +528,6 @@ function initializeViewToggles() {
 }
 
 // Contact Form - Fixed
-
 function initializeContactForm() {
   if (!contactForm) return;
   emailjs.init('UwMzMd72bjqBXUOXO');
@@ -573,46 +572,57 @@ function initializeContactForm() {
     }
     submitBtn.disabled = true;
     
-    // Simulate form submission with proper promise resolution
     try {
-     
-  
-      await emailjs.sendForm(
-        'service_hqlzwfo',         // ← Your Service ID
-        'template_cpejvrk',     // ← Admin notification template ID
-        contactForm
-      );
-      await emailjs.sendForm( 
-        'service_hqlzwfo',         // ← Your Service ID
-        'template_0orfrol',      // ← User notification template ID
-        contactForm
-      )
+      // Send both emails with Promise.all for better performance
+      await Promise.all([
+        emailjs.sendForm(
+          'service_hqlzwfo',         // Admin notification
+          'template_cpejvrk',        
+          contactForm
+        ),
+        emailjs.sendForm(
+          'service_hqlzwfo',         // User notification  
+          'template_0orfrol',        
+          contactForm
+        )
+      ]);
 
       // Show success message
       if (formStatus) {
         formStatus.className = 'form-status success';
-        formStatus.textContent = 'Thank you! Your message has been sent successfully.';
+        formStatus.textContent = 'Thank you! Your message has been sent successfully. You will receive a confirmation email shortly.';
       }
       
-      // Reset form
+      // Reset form only after successful email sending
       contactForm.reset();
+      
+      // Clear success message after delay
       setTimeout(() => {
-        formStatus.textContent = '';
-        formStatus.className = 'form-status';
-      }, 4500);
-  
+        if (formStatus) {
+          formStatus.textContent = '';
+          formStatus.className = 'form-status';
+        }
+      }, 5000); // Increased to 5 seconds for better UX
+
     } catch (error) {
-      // Show error message
+      console.error('Email sending failed:', error);
+      
+      // Show specific error message
       if (formStatus) {
         formStatus.className = 'form-status error';
-        formStatus.textContent = 'Sorry, there was an error sending your message. Please try again.';
+        formStatus.textContent = error.text || 'Sorry, there was an error sending your message. Please try again or contact us directly.';
       }
+      
+      // Clear error message after delay
       setTimeout(() => {
-        formStatus.textContent = '';
-        formStatus.className = 'form-status error';
-      }, 2500);
+        if (formStatus) {
+          formStatus.textContent = '';
+          formStatus.className = 'form-status';
+        }
+      }, 4000);
+      
     } finally {
-      // Hide loading state
+      // Always restore button state
       if (btnText && btnLoading) {
         btnText.classList.remove('hidden');
         btnLoading.classList.add('hidden');
@@ -621,6 +631,7 @@ function initializeContactForm() {
     }
   });
 }
+
 
 function validateContactForm(data) {
   const errors = {};
